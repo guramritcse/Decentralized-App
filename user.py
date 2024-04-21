@@ -21,14 +21,16 @@ class User:
         else:
             return 0
 
-    def article_uploader(self):
+    def article_uploader(self, start, step):
+        yield self.env.timeout(start)
         while True:
-            yield self.env.timeout(120)
-            print(f"Voter {self.idx} uploads an article")
+            # print(f"Voter {self.idx} uploads an article")
+            category = 1 # assumed to be the only category
             title = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
-            content = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(100))
+            content = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(50))
             ground_truth = self.generate_RV(0.5)
-            self.dapp.upload_contract(title, content, self.idx, ground_truth)
+            self.dapp.upload_contract(category, title, content, self.idx, ground_truth)
+            yield self.env.timeout(step)
 
     def register_checker(self):
         self.dapp.register_checker(self.idx)
@@ -36,9 +38,9 @@ class User:
     def deregister_checker(self):   
         self.dapp.deregister_checker(self.idx)
             
-    def vote(self):
+    def vote(self, start, step):
+        yield self.env.timeout(start)
         while True:
-            yield self.env.timeout(123)
             all_contracts = self.dapp.get_contracts()
             for chosen_contract in all_contracts:
                 if chosen_contract in self.articles_voted:
@@ -51,16 +53,18 @@ class User:
                     vote = chosen_contract.ground_truth if self.generate_RV(0.9) else 1 - chosen_contract.ground_truth
                 self.dapp.vote(self.idx, chosen_contract, vote)
                 self.articles_voted.append(chosen_contract)
-                print(f"Voter {self.idx} votes for the contract {chosen_contract} with vote {vote}")
+                # print(f"Voter {self.idx} votes for the contract {chosen_contract} with vote {vote}")
+            yield self.env.timeout(step)
 
-    def get_result(self):
+    def get_result(self, start, step):
+        yield self.env.timeout(start)
         while True:
-            yield self.env.timeout(995)
             all_contracts = self.dapp.get_contracts()
             if len(all_contracts) == 0:
                 continue
             chosen_contract = random.choice(all_contracts)
-            print(f"Voter {self.idx} asks for the result of contract {chosen_contract}")
+            # print(f"Voter {self.idx} asks for the result of contract {chosen_contract}")
             result = self.dapp.get_result(chosen_contract)
-            print(f"Result of the contract {chosen_contract} is {result}")
+            # print(f"Result of the contract {chosen_contract} is {result}")
+            yield self.env.timeout(step)
 

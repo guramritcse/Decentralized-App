@@ -14,26 +14,31 @@
 ```python3 run.py --help```
 - The above command will display the following:
 ```
-usage: run.py [-h] [--info] [--N N] [--q Q] [--p P] [--T_sim T_SIM] [--output_dir OUTPUT_DIR]
+usage: run.py [-h] [--info] [--N N] [--p P] [--q Q] [--A A] [--T_sim T_SIM] [--I I] [--output_dir OUTPUT_DIR]
 
 Simulation of a Decentralized App using Blockchain
 
 options:
   -h, --help                show this help message and exit
   --info                    Generate info
-  --N N                     Number of peers in the network
-  --q Q                     Fraction of malicious voters
-  --p P                     Fraction of very trust worthy voters
+  --N N                     Number of voters in the DApp
+  --p P                     Percentage of very trust worthy voters
+  --q Q                     Percentage of malicious voters
+  --A A                     Number of articles per user
   --T_sim T_SIM             Simulation time (in ms)
+  --I I                     Article interval for getting trustworthiness stats in graph
   --output_dir OUTPUT_DIR   Output directory
+
 ```
 - Options are given default values, so if you want to run the simulator with the default values, you can simply run:
 ```python3 run.py```
 - The default values are:
     - N: 50
-    - q: 20
     - p: 50
+    - q: 10
+    - A: 1
     - T_sim: 400
+    - I: 4 
     - output_dir: output
 - The output of the simulator will be stored in the output directory. The following files will be generated:
     - info.txt: The info about the miners if --info flag is used

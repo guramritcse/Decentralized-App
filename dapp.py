@@ -9,9 +9,6 @@ class DApp:
 
     def update_trust_worthiness(self):
         for voter in self.registered_voters:
-            # Do not include deregistered voters in trustworthiness calculation
-            if self.registered_voters[voter] == 0:
-                continue
             correct_votes = 0
             incorrect_votes = 0
             for contract in self.contracts:
@@ -25,10 +22,13 @@ class DApp:
         for contract in self.contracts: 
             contract.update_trust_worthiness(self.trust_worthiness)
 
-        print(f"Trustworthiness updated at time {self.env.now} and trustworthiness is {self.trust_worthiness}")
+        # print(f"Trustworthiness updated at time {self.env.now} and trustworthiness is {self.trust_worthiness}")
     
-    def upload_contract(self, title, content, author, truth):
-        contract = SmartContract(title, content, author, truth, self.trust_worthiness)
+    def upload_contract(self, category, title, content, author, truth):
+        if category < 1 or category > 10:
+            print("Invalid category")
+            return
+        contract = SmartContract(category, title, content, author, truth, self.trust_worthiness)
         self.contracts.append(contract)
         return contract
     
@@ -89,8 +89,7 @@ class DApp:
             info[voter] = [correct_votes, incorrect_votes, trust_worthiness, actual_correct_votes, actual_incorrect_votes, actual_trust_worthiness]
         return info
     
-    def get_trust_worthiness_stats(self):
-        # Store trustworthiness of all voters for every 50 contracts
+    def get_trust_worthiness_stats(self, interval):
         trust_worthiness_stats = dict()
         for voter in self.trust_worthiness:
             trust_worthiness_stats[voter] = [[1, 0, 0]]
@@ -102,7 +101,7 @@ class DApp:
                         correct_votes += 1
                     else:
                         incorrect_votes += 1
-                if i % 50 == 0:
+                if (i+1) % interval == 0:
                     trust_worthiness_stats[voter].append([self.calculate_trust_worthiness(correct_votes, incorrect_votes), correct_votes, incorrect_votes])
         return trust_worthiness_stats
     

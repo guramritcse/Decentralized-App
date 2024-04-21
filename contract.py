@@ -3,15 +3,16 @@ import random
 import datetime
 
 class SmartContract:
-    def __init__(self, title, content, author, ground_truth, trust_worthiness):
+    def __init__(self, category, title, content, author, ground_truth, trust_worthiness):
+        self.category = category
         self.title = title
         self.content = content
         self.author = author
         self.ground_truth = ground_truth
         self.trust_worthiness = trust_worthiness
         self.timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        article_data = f"{self.author} publishes {self.title} with content as {self.content}" + str(random.randint(1, 10000000000)) + "___" + str(random.randint(1, 10000000000))+ f"___{self.timestamp}"
-        self.contract_ID = hashlib.sha256(article_data.encode()).hexdigest()
+        article_data = f"{self.author} publishes {self.title} with content as {self.content}" + str(random.randint(1000000000, 9999999999))+ f"{self.timestamp}"
+        self.contract_ID = hashlib.sha256(str(self.category).encode()).hexdigest() + hashlib.sha256(article_data.encode()).hexdigest()
         self.voted = {}
 
     def __str__(self):
@@ -29,7 +30,7 @@ class SmartContract:
         self.trust_worthiness = trust_worthiness
 
     def result(self):
-        if len(self.voted) < 0:
+        if len(self.voted) == 0:
             return -1
         else:
             positive, negative = 0, 0

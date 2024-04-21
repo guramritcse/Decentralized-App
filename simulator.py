@@ -4,13 +4,15 @@ from dapp import DApp
 import matplotlib.pyplot as plt
 
 class Simulator:
-    def __init__(self, N, q, p, T_sim, env):
+    def __init__(self, N, p, q, A, T_sim, I, env):
         # Initial parameters
         self.N = N
         self.p = p
         self.q = q
-        self.env = env
+        self.A = A
         self.T_sim = T_sim
+        self.I = I
+        self.env = env
 
         self.voter_dict = {}
         self.dapp = DApp(self.env)
@@ -39,15 +41,15 @@ class Simulator:
     def my_timer(self):
         while True:
             print("Current time is :", self.env.now)
-            yield self.env.timeout(100)
+            yield self.env.timeout(10)
     
     def start_simulation(self):
         # Starting the simulation
         for idx in range(1, self.N+1):
             self.voter_dict[idx].register_checker()
-            self.env.process((self.voter_dict[idx]).article_uploader())
-            self.env.process((self.voter_dict[idx]).vote())
-            self.env.process((self.voter_dict[idx]).get_result())
+            self.env.process((self.voter_dict[idx]).article_uploader(idx, self.T_sim//self.A))
+            self.env.process((self.voter_dict[idx]).vote(0, 1))
+            self.env.process((self.voter_dict[idx]).get_result(self.T_sim-10, 50))
         
         self.env.process(self.my_timer())
 
@@ -56,7 +58,7 @@ class Simulator:
         print(f"Writing simulation's parameters")
         num_contracts = len(self.dapp.get_contracts())
         info = self.dapp.get_info()
-        stats = self.dapp.get_trust_worthiness_stats()
+        stats = self.dapp.get_trust_worthiness_stats(self.I)
         with open(f"{output_dir}/info.txt", "w") as f:
             f.write(f"Simulation time (in ms): {self.T_sim}\n")
             f.write(f"Number of voters in the network (N): {self.N}\n")
@@ -106,16 +108,16 @@ class Simulator:
             f.write("End of simulation\n")
 
             print(f"Generating plots")
-            x_ticks = [50*tick for tick in range(total_ticks)]
+            x_ticks = [self.I * tick for tick in range(total_ticks)]
             if type_count[0] != 0:
                 plt.plot(x_ticks, mean_trustworthiness[0], marker = '*', ls = ':', lw = 1, c = 'r', ms = 7, mec = 'g', mfc = 'hotpink', label = 'malicious')
             if type_count[1] != 0:
-                plt.plot(x_ticks, mean_trustworthiness[1], marker = 'o', ls = '--', lw = 1, c = 'b', ms = 7, mec = 'r', mfc = 'skyblue', label = 'trustworthy')
+                plt.plot(x_ticks, mean_trustworthiness[1], marker = 'o', ls = '--', lw = 1, c = 'b', ms = 5, mec = 'r', mfc = 'skyblue', label = 'trustworthy')
             if type_count[2] != 0:
-                plt.plot(x_ticks, mean_trustworthiness[2], marker = 's', ls = '-.', lw = 1, c = 'g', ms = 7, mec = 'b', mfc = 'lightgreen', label = 'very_trustworthy')
-            plt.xlabel('Number of Articles Voted')
+                plt.plot(x_ticks, mean_trustworthiness[2], marker = 's', ls = '-.', lw = 1, c = 'g', ms = 5, mec = 'b', mfc = 'lightgreen', label = 'very_trustworthy')
+            plt.xlabel('Number of Articles considered for calculating Trustworthiness')
             plt.ylabel('Mean Trustworthiness')
-            plt.title('Trustworthiness of Voters')
+            plt.title(f'Trustworthiness of Voters, p = {self.p}, q = {self.q}')
             plt.xticks(x_ticks)
             plt.yticks([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
             plt.legend()

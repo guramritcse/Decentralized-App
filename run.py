@@ -10,10 +10,12 @@ def main():
 
     # Adding arguments
     parser.add_argument('--info', action="store_true", help='Generate info')
-    parser.add_argument('--N', type=int, default=50, help='Number of peers in the network')
-    parser.add_argument('--q', type=int, default=20, help='Fraction of malicious voters')
-    parser.add_argument('--p', type=int, default=50, help='Fraction of very trust worthy voters')
+    parser.add_argument('--N', type=int, default=50, help='Number of voters in the DApp')
+    parser.add_argument('--p', type=int, default=50, help='Percentage of very trust worthy voters')
+    parser.add_argument('--q', type=int, default=10, help='Percentage of malicious voters')
+    parser.add_argument('--A', type=int, default=1, help='Number of articles per user')
     parser.add_argument('--T_sim', type=int, default=400, help='Simulation time (in ms)')
+    parser.add_argument('--I', type=int, default=4, help='Article interval for getting trustworthiness stats in graph')
     parser.add_argument('--output_dir', type=str, default="output", help='Output directory')
     # note I is in secs
 
@@ -33,12 +35,22 @@ def main():
     if args.N < 1:
         print("Number of users in the network should be at least 1")
         exit(1)
+    if args.A < 1:
+        print("Number of articles per user should be at least 1")
+        exit(1)
+    if args.T_sim < 0:
+        print("Simulation time should be at least 0")
+        exit(1)
+    if args.I < 1:
+        print("Article interval should be at least 1")
+        exit(1)
+
 
     # env = simpy.Environment(factor=0.001)
     env = simpy.Environment()
 
     # Simulating the network
-    sim = Simulator(args.N, args.q, args.p, args.T_sim, env)
+    sim = Simulator(args.N, args.p, args.q, args.A, args.T_sim, args.I, env)
     
     # Setting simulation entities
     sim.start_simulation()
