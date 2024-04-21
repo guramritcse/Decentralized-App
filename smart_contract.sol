@@ -369,5 +369,11 @@ contract DApp {
 
         // Return 1 if the article is true, 0 if the article is false
         return articleTruthValue[articleID]; 
+    }
+
+    // Function to get the deposit amount of a fact-checker
+    function getDeposit(address pkey) external view returns (uint) {
+        require(factCheckers[pkey].registrationStatus, "Fact-checker not registered");
+        return factCheckers[pkey].deposit;
     }   
 }
