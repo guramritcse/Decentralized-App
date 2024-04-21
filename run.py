@@ -14,7 +14,7 @@ def main():
     parser.add_argument('--p', type=int, default=50, help='Percentage of very trust worthy voters')
     parser.add_argument('--q', type=int, default=10, help='Percentage of malicious voters')
     parser.add_argument('--A', type=int, default=1, help='Number of articles per user')
-    parser.add_argument('--T_sim', type=int, default=400, help='Simulation time (in ms)')
+    parser.add_argument('--T_sim', type=int, default=200, help='Simulation time (in ms)')
     parser.add_argument('--I', type=int, default=4, help='Article interval for getting trustworthiness stats in graph')
     parser.add_argument('--output_dir', type=str, default="output", help='Output directory')
     # note I is in secs

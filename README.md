@@ -37,23 +37,23 @@ options:
     - p: 50
     - q: 10
     - A: 1
-    - T_sim: 400
+    - T_sim: 200
     - I: 4 
     - output_dir: output
 - The output of the simulator will be stored in the output directory. The following files will be generated:
     - info.txt: The info about the miners if --info flag is used
-    - trustworthiness.png: The plot representing the trustworthiness of the voters VS the number of articles they have voted on
+    - trustworthiness.png: The plot representing the trustworthiness of the voters v/s the number of articles they have voted on
 
 ## Directory Structure
 - This directory contains the following files:
     - [run.py](run.py): The main file to run the simulator
     - [README.md](README.md): This README file
     - [Report.pdf](Report.pdf): The report of this assignment
-    - [pseudo.sol](pseudo.sol): The pseudo code of the smart contract written in Solidity
     - [simulator.py](simulator.py): The simulator class
     - [user.py](user.py): The User class denoting each user of the DApp
     - [dapp.py](dapp.py): The DApp class denoting the DApp
     - [contract.py](contract.py): The SmartContract class denoting the smart contract
+    - [smart_contract.sol](smart_contract.sol): The smart contract written in Solidity
     - [results](results): This directory contains the files of the simulation and analysis that have been used in the report
  
 ## Libraries used and their versions
