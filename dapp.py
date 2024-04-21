@@ -11,6 +11,7 @@ class DApp:
         for voter in self.registered_voters:
             correct_votes = 0
             incorrect_votes = 0
+            # Calculate correct and incorrect votes for each voter
             for contract in self.contracts:
                 if voter in contract.voted:
                     if contract.result() == contract.voted[voter]:
@@ -68,6 +69,7 @@ class DApp:
         return contract.result()
   
     def get_info(self):
+        # Calculate actual and implied trustworthiness, correct votes, incorrect votes for each voter and return the info
         info = dict()
         for voter in self.registered_voters:
             actual_correct_votes = 0
@@ -90,6 +92,7 @@ class DApp:
         return info
     
     def get_trust_worthiness_stats(self, interval):
+        # Calculate trustworthiness stats for each voter at each interval
         trust_worthiness_stats = dict()
         for voter in self.trust_worthiness:
             trust_worthiness_stats[voter] = [[1, 0, 0]]

@@ -19,6 +19,7 @@ class SmartContract:
         return f"Title: {self.title}\nContent: {self.content}\nAuthor: {self.author}\nTimestamp: {self.timestamp}\nContract ID: {self.contract_ID}\nGround Truth: {self.ground_truth}\n"
 
     def vote(self, voter, vote):
+        # Check if voter has already voted
         if voter not in self.voted:
             self.voted[voter] = vote
             return 0
@@ -33,6 +34,7 @@ class SmartContract:
         if len(self.voted) == 0:
             return -1
         else:
+            # Calculate the result based on the votes
             positive, negative = 0, 0
             for voter in self.trust_worthiness:
                 if voter in self.voted:

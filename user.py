@@ -21,6 +21,7 @@ class User:
         else:
             return 0
 
+    # Uploading an article to the DApp
     def article_uploader(self, start, step):
         yield self.env.timeout(start)
         while True:
@@ -32,12 +33,15 @@ class User:
             self.dapp.upload_contract(category, title, content, self.idx, ground_truth)
             yield self.env.timeout(step)
 
+    # Registering the voter to the DApp
     def register_checker(self):
         self.dapp.register_checker(self.idx)
-        
+
+    # Deregistering the voter from the DApp      
     def deregister_checker(self):   
         self.dapp.deregister_checker(self.idx)
-            
+
+    # Voting for a contract in the DApp      
     def vote(self, start, step):
         yield self.env.timeout(start)
         while True:
@@ -56,6 +60,7 @@ class User:
                 # print(f"Voter {self.idx} votes for the contract {chosen_contract} with vote {vote}")
             yield self.env.timeout(step)
 
+    # Getting the result of a contract in the DApp
     def get_result(self, start, step):
         yield self.env.timeout(start)
         while True:

@@ -17,7 +17,7 @@ def main():
     parser.add_argument('--T_sim', type=int, default=200, help='Simulation time (in ms)')
     parser.add_argument('--I', type=int, default=4, help='Article interval for getting trustworthiness stats in graph')
     parser.add_argument('--output_dir', type=str, default="output", help='Output directory')
-    # note I is in secs
+
 
     # Parse the command-line arguments
     args = parser.parse_args()
