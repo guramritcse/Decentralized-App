@@ -150,7 +150,7 @@ contract DApp {
         // Update the positiveVote mapping for the fact-checker
         factCheckers[msg.sender].positiveVote[articleID] = voteValue;
         // Update result of the vote
-        updateTruthValue(articleID);
+        updateTruthValue(articleID, category);
         // Update trustworthiness score for each category
         for (uint i = 0; i < 10; i++) {
             updateTrustworthiness(i);
@@ -192,16 +192,21 @@ contract DApp {
     }
 
     // Function to update truth value of an article
-    function updateTruthValue(bytes32 articleID) internal {
+    function updateTruthValue(bytes32 articleID, uint category) internal {
+        // Count votes only if fact-checker is still registered
+        uint totalVotes = 0;
         uint positiveVotes = 0;
         for (uint i = 0; i < articleVotes[articleID].length; i++) {
-            if (articleVotes[articleID][i].vote) {
-                positiveVotes++;
+            if (factCheckers[articleVotes[articleID][i].user].registrationStatus && factCheckers[articleVotes[articleID][i].user].voted[articleID]) {
+                totalVotes += factCheckers[articleVotes[articleID][i].user].stake[category] * factCheckers[articleVotes[articleID][i].user].trustworthiness[category];
+                if(factCheckers[articleVotes[articleID][i].user].positiveVote[articleID]){
+                    positiveVotes+= factCheckers[articleVotes[articleID][i].user].stake[category] * factCheckers[articleVotes[articleID][i].user].trustworthiness[category];
+                }
             }
         }
         
         // Update the truth value of the article based on the majority vote
-        if (positiveVotes >= articleVotes[articleID].length / 2) {
+        if (positiveVotes >= totalVotes / 2) {
             articleTruthValue[articleID] = true;
         } else {
             articleTruthValue[articleID] = false;
@@ -242,14 +247,14 @@ contract DApp {
         uint totalStake = 0;
         for (uint l = 0; l < factCheckersCount; l++) {
             address i = indexedFactCheckers[l];
-            if (factCheckers[i].votes[category] >= 5 && factCheckers[i].registrationStatus) {
+            if (factCheckers[i].votes[category] >= 10 && factCheckers[i].registrationStatus) {
                 totalStake += factCheckers[i].stake[category] * factCheckers[i].trustworthiness[category];
             }
         }
         // Distribute the amount among the users
         for (uint l = 0; l < factCheckersCount; l++) {
             address i = indexedFactCheckers[l];
-            if (factCheckers[i].votes[category] >= 5 && factCheckers[i].registrationStatus) {
+            if (factCheckers[i].votes[category] >= 10 && factCheckers[i].registrationStatus) {
                 // Increase the deposit amount of the user and update the stake
                 factCheckers[i].deposit += (factCheckers[i].stake[category] * factCheckers[i].trustworthiness[category] / totalStake) * confiscatedStake;
                 uint totalVotes = 0;
@@ -263,7 +268,7 @@ contract DApp {
         }
         // Update truth value for all articles in this category
         for (uint i = 0; i < articles[category].length; i++) {
-            updateTruthValue(articles[category][i]);
+            updateTruthValue(articles[category][i], category);
         }
         // Update trustworthiness score 
         for (uint i = 0; i < 10; i++) {
@@ -276,7 +281,7 @@ contract DApp {
         // Check if the trustworthiness score of any fact-checker is below 0.2 in this category
         for (uint l = 0; l < factCheckersCount; l++) {
             address i = indexedFactCheckers[l];
-            if (factCheckers[i].votes[category] >= 5 && factCheckers[i].trustworthiness[category] < 20 && factCheckers[i].registrationStatus) {
+            if (factCheckers[i].votes[category] >= 10 && factCheckers[i].trustworthiness[category] < 20 && factCheckers[i].registrationStatus) {
                 confiscateStake(factCheckers[i].publicKey, category);
             }
         }
@@ -315,11 +320,11 @@ contract DApp {
         // Get the total stake * trustworthiness score for this article 
         // and distribute among users who voted for the majority vote 
         // and have trustworthiness score > 0.4 in this category
-        // and have voted for at least 5 articles in this category
+        // and have voted for at least 10 articles in this category
         uint totalStake = 0;
         for (uint l = 0; l < factCheckersCount; l++) {
             address i = indexedFactCheckers[l];
-            if (factCheckers[i].votes[category] >= 5 && factCheckers[i].trustworthiness[category] > 40 && factCheckers[i].registrationStatus && factCheckers[i].voted[articleID]) {
+            if (factCheckers[i].votes[category] >= 10 && factCheckers[i].trustworthiness[category] > 40 && factCheckers[i].registrationStatus && factCheckers[i].voted[articleID]) {
                 // Check if the user voted for the majority vote
                 if (factCheckers[i].positiveVote[articleID] == articleTruthValue[articleID]) {
                     totalStake += factCheckers[i].stake[category] * factCheckers[i].trustworthiness[category];
@@ -329,7 +334,7 @@ contract DApp {
         // Distribute the amount among the users who voted for the majority vote
         for (uint l = 0; l < factCheckersCount; l++) {
             address i = indexedFactCheckers[l];
-            if (factCheckers[i].votes[category] >= 5 && factCheckers[i].trustworthiness[category] > 40 && factCheckers[i].registrationStatus && factCheckers[i].voted[articleID]) {
+            if (factCheckers[i].votes[category] >= 10 && factCheckers[i].trustworthiness[category] > 40 && factCheckers[i].registrationStatus && factCheckers[i].voted[articleID]) {
                 // Check if the user voted for the majority vote
                 if (factCheckers[i].positiveVote[articleID] == articleTruthValue[articleID]) {
                     // Increase the deposit amount of the user and update the stake
@@ -346,7 +351,7 @@ contract DApp {
         }
         // Update truth value for all articles in this category
         for (uint i = 0; i < articles[category].length; i++) {
-            updateTruthValue(articles[category][i]);
+            updateTruthValue(articles[category][i], category);
         }
         // Update trustworthiness score
         for (uint i = 0; i < 10; i++) {
