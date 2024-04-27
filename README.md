@@ -1,4 +1,4 @@
-# CS765-Decentralized-App
+# Decentralized App
 
 ## Solo Project
 | Name | Roll Number |
